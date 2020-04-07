@@ -142,7 +142,7 @@ type CommonCall struct {
 	Target     int64  `json:"target,omitempty"`
 }
 
-// MessageCall 消息用
+// MessageCall 发送文本消息 图片消息 撤回消息
 type MessageCall struct {
 	CommonCall
 	QQ           int64     `json:"qq,omitempty"`
@@ -154,8 +154,9 @@ type MessageCall struct {
 // ManageCall 群员管理 禁言及踢出群聊
 type ManageCall struct {
 	CommonCall
-	MemberID int64 `json:"memberId"`
-	Time     int   `json:"time,omitempty"`
+	MemberID int64  `json:"memberId"`
+	Time     int    `json:"time,omitempty"`
+	Msg      string `json:"msg,omitempty"`
 }
 
 // ConfigCall 包含群设置及群员设置
