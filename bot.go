@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Logiase/gomirai/message"
 )
 
 // Bot qq机器人
@@ -13,7 +15,7 @@ type Bot struct {
 
 	QQ int64
 
-	MessageChan chan InEvent
+	MessageChan chan Event
 	chanCache   int
 	currentSize int
 	fetchTime   time.Duration
@@ -51,7 +53,7 @@ func (bot *Bot) Release() error {
 
 // SendFriendMessage 使用此方法向指定好友发送消息
 // 如果不需要引用回复，quote设0
-func (bot *Bot) SendFriendMessage(target, quote int64, msg []Message) (int64, error) {
+func (bot *Bot) SendFriendMessage(target, quote int64, msg []message.Message) (int64, error) {
 	postBody := make(map[string]interface{})
 	postBody["sessionKey"] = bot.Session
 	postBody["target"] = target
@@ -72,7 +74,7 @@ func (bot *Bot) SendFriendMessage(target, quote int64, msg []Message) (int64, er
 }
 
 // SendGroupMessage 使用此方法向指定群发送消息
-func (bot *Bot) SendGroupMessage(target, quote int64, msg []Message) (int64, error) {
+func (bot *Bot) SendGroupMessage(target, quote int64, msg []message.Message) (int64, error) {
 	postBody := make(map[string]interface{})
 	postBody["sessionKey"] = bot.Session
 	postBody["target"] = target
@@ -134,7 +136,7 @@ func (bot *Bot) Recall(target int64) error {
 // InitChannel 初始化消息管道
 // size 缓存数量 t 每次Fetch的时间间隔
 func (bot *Bot) InitChannel(size int, t time.Duration) {
-	bot.MessageChan = make(chan InEvent, size)
+	bot.MessageChan = make(chan Event, size)
 	bot.chanCache = size
 	bot.currentSize = 0
 	bot.fetchTime = t
@@ -143,7 +145,7 @@ func (bot *Bot) InitChannel(size int, t time.Duration) {
 // FetchMessage 获取消息，会阻塞当前线程，消息保存在bot中的MessageChan
 // 使用前请使用InitChannel初始化Channel
 func (bot *Bot) FetchMessage() error {
-	var respS InEventAll
+	var respS EventResponse
 	t := time.NewTicker(bot.fetchTime)
 	for {
 		err := bot.Client.httpGet("/fetchMessage?sessionKey="+bot.Session+"&count="+strconv.Itoa(bot.chanCache), &respS)
@@ -163,8 +165,8 @@ func (bot *Bot) FetchMessage() error {
 }
 
 // MessageFromID 通过ID获取一条缓存的消息
-func (bot *Bot) MessageFromID(id int64) (*InEvent, error) {
-	var respS InEvent
+func (bot *Bot) MessageFromID(id int64) (*Event, error) {
+	var respS Event
 	err := bot.Client.httpGet("/messageFromId?sessionKey="+bot.Session+"&id="+strconv.FormatInt(id, 10), &respS)
 	if err != nil {
 		return nil, err

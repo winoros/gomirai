@@ -4,17 +4,19 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
+
+	"github.com/Logiase/gomirai/message"
 )
 
-// InEvent http-api新返回格式
-type InEventAll struct {
-	Code         int64     `json:"code"`
-	ErrorMessage string    `json:"errorMessage,omitempty"`
-	Data         []InEvent `json:"data,omitempty"`
+// Event http-api新返回格式
+type EventResponse struct {
+	Code         int64   `json:"code"`
+	ErrorMessage string  `json:"errorMessage,omitempty"`
+	Data         []Event `json:"data,omitempty"`
 }
 
-// InEvent 获取到的事件
-type InEvent struct {
+// Event 获取到的事件
+type Event struct {
 	Type string `json:"type"`
 	QQ   int64  `json:"qq,omitempty"`
 
@@ -30,7 +32,7 @@ type InEvent struct {
 	Member          GroupMember `json:"member,omitempty"`
 
 	//Message
-	MessageChain []Message `json:"messageChain,omitempty"`
+	MessageChain []message.Message `json:"messageChain,omitempty"`
 
 	Sender       interface{} `json:"sender,omitempty"`
 	SenderGroup  GroupMember `json:"-"`
@@ -42,7 +44,7 @@ type InEvent struct {
 }
 
 // OperatorDetail 获取Operator的详细信息
-func (e *InEvent) OperatorDetail() error {
+func (e *Event) OperatorDetail() error {
 	// Operator 为GroupMember
 	if reflect.TypeOf(e.Operator) == reflect.TypeOf(make(map[string]interface{})) {
 		bytesData, err := json.Marshal(e.Operator)
@@ -60,7 +62,7 @@ func (e *InEvent) OperatorDetail() error {
 }
 
 // SenderDetail 获取Sender的详细信息
-func (e *InEvent) SenderDetail() error {
+func (e *Event) SenderDetail() error {
 	if reflect.TypeOf(e.Sender).Kind() == reflect.Map {
 		keys := reflect.ValueOf(e.Sender).MapKeys()
 		for _, k := range keys {

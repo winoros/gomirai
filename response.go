@@ -5,7 +5,13 @@ type Response struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
 
+	ErrorMessage string `json:"errorMessage,omitempty"`
+	Data         Data   `json:"data,omitempty"`
+
 	MessageID int64 `json:"messageId,omitempty"`
+}
+
+type Data struct {
 }
 
 // AuthResponse 认证响应
