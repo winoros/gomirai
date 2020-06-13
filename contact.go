@@ -18,7 +18,7 @@ type GroupMember struct {
 // Friend 好友
 type Friend struct {
 	ID       int64  `json:"id"`
-	NickName string `json:"nickName"`
+	NickName string `json:"nickname"`
 	Remark   string `json:"remark"`
 }
 
